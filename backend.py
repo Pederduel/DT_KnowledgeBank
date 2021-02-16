@@ -15,8 +15,9 @@ db = cluster["KnowledgeBank"]
 # setting collection variables
 modelsCollection = db["models"]
 
-test1 = {"_id": 0, "name": "Hypertension", "Description": "Predicts risk of developing hypertension", 
+# first connection test
+'''test1 = {"_id": 0, "name": "Hypertension", "Description": "Predicts risk of developing hypertension", 
 "beta_0": -15.139611, "beta_1": 0.048337, "beta_2": 0.055844, "beta_3": 0.060932, 
 "Age": 25, "Systolic": 120, "Diastolic": 75}
 
-modelsCollection.insert_one(test1)
+modelsCollection.insert_one(test1)'''
