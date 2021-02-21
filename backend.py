@@ -3,6 +3,15 @@ from pymongo import MongoClient
 import os # for using os commands
 import settings # importing settings.py allows us to use the os.getenv command for calling the .env file
 
+# imports for machine learning
+import pandas as pd
+import numpy as np
+from sklearn import datasets
+import pickle
+import time
+
+
+
 # importing database url from .env file
 mongoUrl = os.getenv("MONGO_URL")
 
