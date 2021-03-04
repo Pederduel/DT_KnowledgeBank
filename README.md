@@ -4,7 +4,18 @@ Used for storing and distributing machine learning models to the Digital Twins m
 
 ## Needed packages are:
 
-### pymongo: pip install pymongo
- - To get the dnspython module: pip install pymongo[srv] (Needed to connect to the MongoDB Atlas cluster)
+### pymongo: 
+```bash
+pip install pymongo
+```
 
-### environment: pip install -U python-dotenv
+ - To get the dnspython module: 
+ ```bash
+ pip install pymongo[srv]
+ ``` 
+ (Needed to connect to the MongoDB Atlas cluster)
+
+### environment: 
+```bash
+pip install -U python-dotenv
+```
