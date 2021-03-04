@@ -19,3 +19,8 @@ pip install pymongo
 ```bash
 pip install -U python-dotenv
 ```
+### Server (Flask)
+```bash
+pip install flask
+pip install Flask-PyMongo
+```
