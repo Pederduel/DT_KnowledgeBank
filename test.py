@@ -1,6 +1,6 @@
-from backend import get
+from backend import get_model
 
-test = get("Hypertension")
+test = get_model("Hypertension")
 
 print(test)
 
