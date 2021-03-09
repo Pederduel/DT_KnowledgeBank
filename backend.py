@@ -38,13 +38,18 @@ class KBModelsAPI(Resource):
         self.knowledgeBank = cluster["KnowledgeBank"] # setting the database variable
         self.KB_Models = knowledgeBank[collection] # setting collection variables
 '''
-@app.route("/model/<model_name>/", methods=['GET'])
-def get(model_name=str):
+@app.route("/models/<model_name>/", methods=['GET'])
+def get_model(model_name=str):
     model = KB_Models.find_one({"name" : model_name})
     if not model:
         exception = pymongo.errors.InvalidName(error_labels=404 ,message="Model with that name could not be found...")
         return exception
     return model
+
+@app.route("/models/", methods=["GET"])
+def get_all_models():
+    models = list(KGE_Models.find())
+    return jsonify(dumps(models))
 
 def put(self, model_id):
     return None
