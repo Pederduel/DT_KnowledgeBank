@@ -5,9 +5,11 @@ import setup # importing setup.py allows us to use the os.getenv command for cal
 
 from flask import Flask, request, json, Response, jsonify
 from flask_restful import Api, Resource
+from flask_restx import Api, Resource, fields
 from flask_pymongo import PyMongo
 from bson.json_util import dumps
 from bson.objectid import ObjectId
+#from werkzeug.utils import cached_property
 
 # imports for machine learning
 import pandas as pd
@@ -28,9 +30,13 @@ KGE_Models = knowledgeGenerator["fs.files"]
 knowledgeBank = cluster["KnowledgeBank"]
 KB_Models = knowledgeBank["models"]
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = mongoUrl
-mongo = PyMongo(app)
+flask_app = Flask(__name__)
+flask_app.config["MONGO_URI"] = mongoUrl
+mongo = PyMongo(flask_app)
+api = Api(app=flask_app,
+            version=0.01,
+            title="Knowledge Bank",
+            description="Backend for storing and managing machinelearning models in Digital Twins project")
 '''
 class KBModelsAPI(Resource):
     def __init__(self, collection):
@@ -38,24 +44,27 @@ class KBModelsAPI(Resource):
         self.knowledgeBank = cluster["KnowledgeBank"] # setting the database variable
         self.KB_Models = knowledgeBank[collection] # setting collection variables
 '''
-@app.route("/models/<model_name>/", methods=['GET'])
-def get_model(model_name=str):
-    model = KB_Models.find_one({"name" : model_name})
-    if not model:
-        exception = pymongo.errors.InvalidName(error_labels=404 ,message="Model with that name could not be found...")
-        return exception
-    return model
 
-@app.route("/models/", methods=["GET"])
+@api.route("/models/<model_name>/")
+@api.doc(params={'name': 'Model name'})
+class GetModel(Resource):
+    def get(self, model_name):
+        model = KB_Models.find_one({"name" : model_name})
+        if not model:
+            exception = pymongo.errors.InvalidName(error_labels=404 ,message="Model with that name could not be found...")
+            return exception
+        return model
+
+'''@api.route("/models/", methods=["GET"])
 def get_all_models():
     models = list(KGE_Models.find())
     return jsonify(dumps(models))
 
 def put(self, model_id):
     return None
-
+'''
 if __name__ == "__main__":
-    app.run(debug=True)
+    flask_app.run(debug=True)
 
 
 
