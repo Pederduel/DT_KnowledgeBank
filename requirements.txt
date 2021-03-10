@@ -1,0 +1,5 @@
+-U python-dotenv
+pymongo
+pymongo[srv]
+flask
+Flask-PyMongo
