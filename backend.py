@@ -1,7 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 import os # for using os commands
-import settings # importing settings.py allows us to use the os.getenv command for calling the .env file
+import setup # importing setup.py allows us to use the os.getenv command for calling the .env file
 
 from flask import Flask, request, json, Response, jsonify
 from flask_restful import Api, Resource
