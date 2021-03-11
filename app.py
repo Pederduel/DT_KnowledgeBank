@@ -32,7 +32,7 @@ KB_Models = knowledgeBank["models"]
 
 flask_app = Flask(__name__)
 flask_app.config["MONGO_URI"] = mongoUrl
-mongo = PyMongo(flask_app, uri=mongoUrl)
+#mongo = PyMongo(flask_app, uri=mongoUrl)
 #print(flask_app.config["MONGO_URI"])
 api = Api(app=flask_app,
             version=0.01,
