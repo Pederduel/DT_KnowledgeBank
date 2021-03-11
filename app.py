@@ -12,10 +12,10 @@ from bson.objectid import ObjectId
 #from werkzeug.utils import cached_property
 
 # imports for machine learning
-import pandas as pd
-import numpy as np
-from sklearn import datasets, svm, linear_model
-import pickle
+#import pandas as pd
+#import numpy as np
+#from sklearn import datasets, svm, linear_model
+#import pickle
 
 # importing url's from .env file
 mongoUrl = os.getenv("MONGO_URL")
