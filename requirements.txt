@@ -6,3 +6,4 @@ Flask-PyMongo
 flask-restx
 flask-restful
 gunicorn
+dnspython
