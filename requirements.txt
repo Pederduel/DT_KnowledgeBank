@@ -4,3 +4,5 @@ pymongo[srv]
 flask
 Flask-PyMongo
 flask-restx
+flask-restful
+gunicorn
