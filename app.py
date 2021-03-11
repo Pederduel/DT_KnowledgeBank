@@ -30,11 +30,11 @@ KGE_Models = knowledgeGenerator["fs.files"]
 knowledgeBank = cluster["KnowledgeBank"]
 KB_Models = knowledgeBank["models"]
 
-flask_app = Flask(__name__)
-flask_app.config["MONGO_URI"] = mongoUrl
+app = Flask(__name__)
+app.config["MONGO_URI"] = mongoUrl
 #mongo = PyMongo(flask_app, uri=mongoUrl)
 #print(flask_app.config["MONGO_URI"])
-api = Api(app=flask_app,
+api = Api(app=app,
             version=0.01,
             title="Knowledge Bank",
             description="Backend for storing and managing machinelearning models in Digital Twins project")
@@ -65,7 +65,7 @@ def put(self, model_id):
     return None
 '''
 if __name__ == "__main__":
-    flask_app.run(debug=True)
+    app.run(debug=True)
 
 
 
