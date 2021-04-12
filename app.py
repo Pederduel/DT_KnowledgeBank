@@ -3,42 +3,55 @@ from pymongo import MongoClient
 import os # for using os commands
 import setup # importing setup.py allows us to use the os.getenv command for calling the .env file
 
-from flask import Flask, request, json, Response, jsonify
+from flask import Flask, request, json, Response, jsonify, make_response, send_file
 from flask_restful import Api, Resource
 from flask_restx import Api, Resource, fields
 from flask_pymongo import PyMongo
 from bson.json_util import dumps
 from bson.objectid import ObjectId
+import requests
+from gridfs import GridFS
+import urllib
 
 # imports for machine learning
-#import pandas as pd
-#import numpy as np
-#from sklearn import datasets, svm, linear_model
-#import pickle
+import pandas as pd
+import numpy as np
+from sklearn import datasets, svm, linear_model
+import pickle
+from pickle import load
+import json
+import onnx
+from onnx import load_model
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import StringTensorType, FloatTensorType
+import onnxruntime as rt
+
+import onnxmltools
+import onnxmltools.convert.common.data_types
+
 
 # -------- SETUP -------- #
 
-mongoUrl = os.getenv("MONGO_URL")
-localUrl = os.getenv("BASE_URL") # not used
-herokuUrl = os.getenv("BASE_URL2") # not used and needs to be changed
+mongoUrl = os.getenv("MONGO_URL")                      # URL for the MongoDB Atlas cluster
+KGEUrl = "https://kge-dtapp.herokuapp.com/model-onnx"  # URL for the KGE heroku endpoints
 
-client = MongoClient(mongoUrl)
+client = MongoClient(mongoUrl)                    # The cluster itself as the client
 
-knowledgeGenerator = client["KnowledgeGenerator"]
-KGE_Models = knowledgeGenerator["fs.files"]
+knowledgeGenerator = client["KnowledgeGenerator"] # KGE database
+KGE_Models = knowledgeGenerator["fs.files"]       # The collection within the database storing the trained models
 
-knowledgeBank = client["KnowledgeBank"]
-KB_Models = knowledgeBank["models"]
+knowledgeBank = client["KnowledgeBank"]           # KB database
+KB_Models = knowledgeBank["fs.files"]               # The collection storing the models in the KB
+fs = GridFS(knowledgeBank)                        # Using GridFS to store large files in MongoDB
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = mongoUrl
-#mongo = PyMongo(flask_app, uri=mongoUrl) Skjønner ikke hva denne brukes til
 api = Api(app=app,
             version=0.01,
             title="Knowledge Bank",
-            description="Backend for storing and managing machinelearning models in Digital Twins project")
+            description="Backend for storing machine learning models in the Digital Twins project")
 
-# -------- SETUP DONE -------- #
+# -------- END SETUP -------- #
 
 
 # -------- METHODS AND ENDPOINTS -------- #
@@ -47,30 +60,92 @@ api = Api(app=app,
 @api.doc(params={'name': 'Model name'})
 class GetModel(Resource):
     def get(self, model_name):
-        model = KB_Models.find_one({"name" : model_name})
-        if not model:
-            exception = pymongo.errors.InvalidName(error_labels=404 ,message="Model with that name could not be found...")
-            return exception
+        try:
+            model = KB_Models.find_one({"name" : model_name})
+        except:
+            e = pymongo.errors.InvalidName(error_labels=404 ,message="The model could not be found...")
+            return e
         return model
+
+@api.route("/models/delete/<model_name>/")
+@api.doc(params={'name': 'Model name'})
+class DeleteModel(Resource):
+    def delete(self, model_name):
+        try:
+            KB_Models.delete_one({'name': model_name})
+        except:
+            e = pymongo.errors.InvalidName(error_labels=404 ,message="The model '{model_name}' could not be found...")
+            return e
+
+@api.route("/kge-models", methods=["GET"])
+class KGEModel(Resource):
+    def get(self):
+        #filename = "model.pkl" # filename for pickled model   
+        onnx_filename = "model-onnx.onnx" # filename for the onnx model
+        #model = requests.get(KGEUrl) # this is the received model from the KGE API (an ONNX model)
+        urllib.request.urlretrieve(KGEUrl, onnx_filename)
+        model = onnx.load(onnx_filename)
+        print("Got model from url")
+        print(model)
+        onnx.save(model, onnx_filename)
+        #pickle.dump(model, open(filename, "wb")) # write pickled model file to disc
+        print("Saved model")
+        #with open(filename, 'rb') as pickle_file:
+        #    pickled_model = pickle.load(pickle_file) # load the model
+        #print("Loaded model.pkl")
+        #save_as_onnx(pickled_model, onnx_filename) # converting and saving pickled model as onnx model
+        '''objects = []
+        with (open(filename, "rb")) as openfile:
+            while True:
+                try:
+                    objects.append(load(openfile))
+                except EOFError:
+                    break
+        '''#sess = rt.InferenceSession(filename)
+        #input_name = sess.get_inputs()[0].name
+        #label_name = sess.get_outputs()[0].name
+        #test_x = np.array([[24, 130, 83, 1]])
+        #prediction = sess.run(None, {input_name: test_x.astype(np.float32)})[0]
+
+        #store_model(onnx_filename, "test_onnx_model", 1, "Onnx file used for testing") # store onnx model in KB
+        fsModel = KB_Models.find_one({'filename': 'test_onnx_model'})
+        print(fsModel)
+        return send_file(onnx_filename, attachment_filename="ONNX Model. v0.1")
+
+def store_model(file, filename, version, desc):
+    with open(file, 'rb') as f:
+        fs.put(f, filename=filename, version=version, description=desc)
+
+def save_as_onnx(model_to_save, filename):
+    initial_type = [('float_input', FloatTensorType([1, 4]))]
+    onx = convert_sklearn(model_to_save, initial_types=initial_type)
+    with open(filename, "wb") as f:
+        f.write(onx.SerializeToString())
+
 '''
 @api.route("/models/")
 class GetAllModels(Resource):
     def get_all_models(self):
         models = list(KGE_Models.find())
         return models
+
+class PostModel(Resource):
+    print("PostModel called")
+    def post(self, serialized_model):
+        print("In post method")
+        try:
+            print("In try")
+            print(serialized_model)
+            KB_Models.insert_one(serialized_model)
+            print(serialized_model)
+        except:
+            e = pymongo.errors.InvalidOperation()
+            return e
 '''
-# -------- METHODS AND ENDPOINTS DONE -------- #
-
-
+# -------- END METHODS AND ENDPOINTS -------- #
 
 # -------- RUN APP -------- #
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-'''
-test1 = {"_id": 0, "name": "Hypertension", "Description": "Predicts risk of developing hypertension", 
-"beta_0": -15.139611, "beta_1": 0.048337, "beta_2": 0.055844, "beta_3": 0.060932}
-
-modelsCollection.insert_one(test1)
-'''
