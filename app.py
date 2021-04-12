@@ -79,38 +79,19 @@ class DeleteModel(Resource):
 
 @api.route("/kge-models", methods=["GET"])
 class KGEModel(Resource):
-    def get(self):
-        #filename = "model.pkl" # filename for pickled model   
+    def get(self):  
         onnx_filename = "model-onnx.onnx" # filename for the onnx model
-        #model = requests.get(KGEUrl) # this is the received model from the KGE API (an ONNX model)
-        urllib.request.urlretrieve(KGEUrl, onnx_filename)
-        model = onnx.load(onnx_filename)
-        print("Got model from url")
-        print(model)
-        onnx.save(model, onnx_filename)
-        #pickle.dump(model, open(filename, "wb")) # write pickled model file to disc
-        print("Saved model")
-        #with open(filename, 'rb') as pickle_file:
-        #    pickled_model = pickle.load(pickle_file) # load the model
-        #print("Loaded model.pkl")
-        #save_as_onnx(pickled_model, onnx_filename) # converting and saving pickled model as onnx model
-        '''objects = []
-        with (open(filename, "rb")) as openfile:
-            while True:
-                try:
-                    objects.append(load(openfile))
-                except EOFError:
-                    break
-        '''#sess = rt.InferenceSession(filename)
+        urllib.request.urlretrieve(KGEUrl, onnx_filename) # request file from url
+        model = onnx.load(onnx_filename) # load onnx file
+        onnx.save(model, onnx_filename) # save as onnx file to make sure its saved correctly (redundant)
+        #sess = rt.InferenceSession(filename)
         #input_name = sess.get_inputs()[0].name
         #label_name = sess.get_outputs()[0].name
         #test_x = np.array([[24, 130, 83, 1]])
         #prediction = sess.run(None, {input_name: test_x.astype(np.float32)})[0]
-
-        #store_model(onnx_filename, "test_onnx_model", 1, "Onnx file used for testing") # store onnx model in KB
-        fsModel = KB_Models.find_one({'filename': 'test_onnx_model'})
-        print(fsModel)
-        return send_file(onnx_filename, attachment_filename="ONNX Model. v0.1")
+        model_name = "test_onnx_model"
+        #store_model(onnx_filename, model_name, 1, "Onnx file used for testing") # store onnx model in KB
+        return send_file(onnx_filename, attachment_filename="ONNX Model. v0.1") # send model when url is requested
 
 def store_model(file, filename, version, desc):
     with open(file, 'rb') as f:
