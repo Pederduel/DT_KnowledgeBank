@@ -14,12 +14,12 @@ from gridfs import GridFS
 import urllib
 
 # imports for machine learning
-import pandas as pd
-import numpy as np
-from sklearn import datasets, svm, linear_model
-import pickle
-from pickle import load
-import json
+#import pandas as pd
+#import numpy as np
+#from sklearn import datasets, svm, linear_model
+#import pickle
+#from pickle import load
+#import json
 import onnx
 from onnx import load_model
 from skl2onnx import convert_sklearn
