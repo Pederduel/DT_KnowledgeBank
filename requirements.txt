@@ -7,3 +7,10 @@ flask-restx
 flask-restful
 gunicorn
 dnspython
+requests
+pandas
+pickle
+sklearn
+onnx
+onnxmltools
+onnxruntime
