@@ -9,7 +9,7 @@ gunicorn
 dnspython
 requests
 pandas
-pickle
+#pickle
 sklearn
 onnx
 onnxmltools
