@@ -86,6 +86,12 @@ def store_model(onnx_file, modelName, version, desc):
 #label_name = sess.get_outputs()[0].name
 #test_x = np.array([[24, 130, 83, 1]])
 #prediction = sess.run(None, {input_name: test_x.astype(np.float32)})[0]
+
+#requests
+#pandas
+#sklearn
+#Flask-PyMongo
+
 # -------- END METHODS AND ENDPOINTS -------- #
 
 # -------- RUN APP -------- #

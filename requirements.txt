@@ -2,13 +2,9 @@ python-dotenv
 pymongo
 pymongo[srv]
 flask
-#Flask-PyMongo
 flask-restx
 gunicorn
 dnspython
-#requests
-#pandas
-#sklearn
 onnx
 onnxmltools
 onnxruntime
