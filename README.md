@@ -15,12 +15,16 @@ pip install pymongo
  ``` 
  (Needed to connect to the MongoDB Atlas cluster)
 
-### environment: 
+### Environment: 
 ```bash
 pip install -U python-dotenv
 ```
 ### Server (Flask)
 ```bash
 pip install flask
-pip install Flask-PyMongo
+pip install flask-restx
+```
+### ONNX:
+```bash
+pip install onnx onnxmltools onnxruntime
 ```
